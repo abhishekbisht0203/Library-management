@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="flex justify-center items-center h-screen">
+        <div class="bg-white p-6 rounded-lg shadow-md w-[400px]">
+            <h1 class="text-2xl font-bold mb-4">Books</h1>
+            <form action="/books" method="post">
+                <div class="mb-4">
+                    <label for="title" class="block text-gray-700 font-bold mb-2">title</label>
+                    <input type="text" placeholder="Title" id="title" name="title" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="author_id" class="block text-gray-700 font-bold mb-2">Author</label>
+                    <select name="author_id" id="author_id" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        {% for author in authors %}
+                            <option value="{{ author[0] }}">{{ author[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="published_date" class="block text-gray-700 font-bold mb-2">Published Date</label>
+                    <input type="date" id="published_date" name="published_date" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="isbn" class="block text-gray-700 font-bold mb-2">ISBN</label>
+                    <input type="text" placeholder="ISBN" id="isbn" name="isbn" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="quantity" class="block text-gray-700 font-bold mb-2">Quantity</label>
+                    <input type="number" placeholder="Quantity" id="quantity" name="quantity" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="available_copies" class="block text-gray-700 font-bold mb-2">Available Copies</label>
+                    <input type="number" placeholder="Available Copies" id="available_copies" name="available_copies" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="created_at" class="block text-gray-700 font-bold mb-2">Created At</label>
+                    <input type="datetime-local" id="created_at" name="created_at" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+
+                <a href="/" class="bg-red-500 hover:bg-green-600 text-white py-2 px-4 rounded-md w-1/4 mt-4 ">← Back </a>
+                <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-white py-2 px-4 rounded-md w-1/4 mx-2 mt-4 ">Submit</button>
+                <a href="/borrowers" class="bg-red-500 hover:bg-green-600 text-white py-2 px-4 rounded-md w-1/4 mt-4 ">Borrowers →</a>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", async (e) => {
+            e.preventDefault(); 
+            const formData = new FormData(e.target);
+    
+            const response = await fetch(e.target.action, {
+                method: "POST",
+                body: formData,
+            });
+    
+            if (response.ok) {
+                alert("Book added successfully!");
+                location.reload(); 
+            } else {
+                alert("Failed to add book!");
+            }
+        });
+    </script>
+    
+    
+</body>
+</html>
