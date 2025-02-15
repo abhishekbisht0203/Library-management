@@ -2,39 +2,34 @@ from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import uuid
-import psycopg2
+from database import connection, cursor
 from datetime import datetime
 import pymysql.cursors
 
-# Initialize FastAPI
+
 app = FastAPI()
 
-# Database connection
-DB_HOST = "localhost"
-DB_NAME = "library_db"
-DB_USER = "postgres"
-DB_PASSWORD = "password"
-cursorclass=pymysql.cursors.DictCursor,  # Use DictCursor for named fields
 
-connection = psycopg2.connect(
-    host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD
-)
-cursor = connection.cursor()
-
-# Jinja2 template configuration
 templates = Jinja2Templates(directory="templates")
 
-# Endpoint to render authors page
+
 @app.get("/", response_class=HTMLResponse)
 async def authors(request: Request):
     cursor.execute("SELECT * FROM authors")
     authors = cursor.fetchall()
     return templates.TemplateResponse("authors.html", {"request": request, "authors": authors})
 
-# Endpoint to create a new author
+
 @app.post("/authors")
 def create_author(name: str = Form(...),email: str = Form(...),date_of_birth: str = Form(...),
 ):
+    # chceck if the email already exists
+    cursor.execute("SELECT * FROM authors WHERE email = %s", (email,))
+    existing_author = cursor.fetchone()
+    if existing_author:
+        raise HTTPException(status_code=400, detail="Email already exists")
+    
+    
     author_id = str(uuid.uuid4())
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute(
@@ -112,6 +107,12 @@ async def borrowers(request: Request):
     
 @app.post("/borrowers")
 async def create_borrower(name: str = Form(...), email: str = Form(...), membership_date: str = Form(...), phone_number: str = Form(...)):
+    
+    # check if the email already exists
+    cursor.execute("SELECT * FROM borrowers WHERE email = %s", (email,))
+    existing_borrower = cursor.fetchone()
+    if existing_borrower:
+        raise HTTPException(status_code=400, detail="Email already exists")
     borrower_id = str(uuid.uuid4())
     created_at = datetime.now().strftime("%y-%m-%d %H:%M:%S")
     cursor.execute(
@@ -188,9 +189,6 @@ async def get_borrower_transactions(borrower_id: str):
     transactions = cursor.fetchall()
     return transactions
     
-
-
-
 
 # Ensure the connection is properly closed on exit
 import atexit
