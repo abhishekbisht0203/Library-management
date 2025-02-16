@@ -158,6 +158,11 @@ async def create_transaction(borrower_id: str = Form(...), book_id: str = Form(.
     
     if not book_id:
         raise HTTPException(status_code=400, detail="Book ID is required")
+    
+    # check transactype_type validity
+    if transaction_type not in ["borrow", "return"]:
+        raise HTTPException (status_code=400, detail="invalid credentials must be 'borrow' or 'return'")
+    
     cursor.execute(
         """
         INSERT INTO transactions (id, borrower_id, book_id, transaction_type, transaction_date, due_date, return_date)
