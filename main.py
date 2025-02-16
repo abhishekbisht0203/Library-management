@@ -152,6 +152,7 @@ async def transaction(request: Request):
 @app.post("/transactions")
 async def create_transaction(borrower_id: str = Form(...), book_id: str = Form(...), transaction_type: str = Form(...), transaction_date: str = Form(...), due_date: str = Form(...), return_date: str = Form(...)):
     transaction_id = str(uuid.uuid4())
+    transaction_type = transaction_type.capitalize()
     
     if not borrower_id:
         raise HTTPException(status_code=400, detail="Borrower ID is required")
@@ -159,9 +160,6 @@ async def create_transaction(borrower_id: str = Form(...), book_id: str = Form(.
     if not book_id:
         raise HTTPException(status_code=400, detail="Book ID is required")
     
-    # check transactype_type validity
-    if transaction_type not in ["borrow", "return"]:
-        raise HTTPException (status_code=400, detail="invalid credentials must be 'borrow' or 'return'")
     
     cursor.execute(
         """
