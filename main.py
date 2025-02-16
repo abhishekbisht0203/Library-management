@@ -4,7 +4,6 @@ from fastapi.templating import Jinja2Templates
 import uuid
 from database import connection, cursor
 from datetime import datetime
-import pymysql.cursors
 
 
 app = FastAPI()
